@@ -1,82 +1,75 @@
-// // 配置API接口地址
-// var root = ''
-// // 引用axios
-// var axios = require('axios')
-// // 自定义判断元素类型JS
-// function toType (obj) {
-//   return ({}).toString.call(obj).match(/\s([a-zA-Z]+)/)[1].toLowerCase()
-// }
-// // 参数过滤函数
-// function filterNull (o) {
-//   for (var key in o) {
-//     if (o[key] === null) {
-//       delete o[key]
-//     }
-//     if (toType(o[key]) === 'string') {
-//       o[key] = o[key].trim()
-//     } else if (toType(o[key]) === 'object') {
-//       o[key] = filterNull(o[key])
-//     } else if (toType(o[key]) === 'array') {
-//       o[key] = filterNull(o[key])
-//     }
-//   }
-//   return o
-// }
-// /*
-//  接口处理函数
-//  这个函数每个项目都是不一样的，我现在调整的是适用于
-//  https://cnodejs.org/api/v1 的接口，如果是其他接口
-//  需要根据接口的参数进行调整。参考说明文档地址：
-//  https://cnodejs.org/topic/5378720ed6e2d16149fa16bd
-//  主要是，不同的接口的成功标识和失败提示是不一致的。
-//  另外，不同的项目的处理方法也是不一致的，这里出错就是简单的alert
-//  */
-//
-// function apiAxios (method, url, params, success, failure) {
-//   if (params) {
-//     params = filterNull(params)
-//   }
-//   axios({
-//     method: method,
-//     url: url,
-//     data: method === 'POST' || method === 'PUT' ? params : null,
-//     params: method === 'GET' || method === 'DELETE' ? params : null,
-//     baseURL: root,
-//     withCredentials: false
-//   })
-//     .then(function (res) {
-//       if (res.data.success === true) {
-//         if (success) {
-//           success(res.data)
-//         }
-//       } else {
-//         if (failure) {
-//           failure(res.data)
-//         } else {
-//           window.alert('error: ' + JSON.stringify(res.data))
-//         }
-//       }
-//     })
-//     .catch(function (err) {
-//       let res = err.response
-//       if (err) {
-//         window.alert('api error, HTTP CODE: ' + res.status)
-//       }
-//     })
-// }
-//
-// // 返回在vue模板中的调用接口
-// export default {
-//   get: function (url, params, success, failure) {
-//     return apiAxios('GET', url, params, success, failure)
-//   },
-//   post: function (url, params, success, failure) {
-//     return apiAxios('POST', url, params, success, failure)
-//   },
-//   put: function (url, params, success, failure) {
-//     return apiAxios('PUT', url, params, success, failure)
-//   },
-//   delete: function (url, params, success, failure) {
-//     return apiAxios('DELETE', url, params, success, failure)
-//   }
-// }
+import axios from 'axios'
+import qs from 'qs'
+
+// axios 配置
+axios.defaults.timeout = 5000
+axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded;charset=UTF-8'
+// axios.defaults.baseURL = 'https://www.zuihuibao.cn/'
+
+// 请求拦截器
+axios.interceptors.request.use(function (config) {
+  console.log('请求前')
+  return config
+}, function (error) {
+  return Promise.reject(error)
+})
+
+// 响应拦截器
+axios.interceptors.response.use(function (response) {
+  console.log('请求后')
+  return response
+}, function (error) {
+  return Promise.reject(error)
+})
+
+axios.interceptors.response.use(response => response, error => Promise.resolve(error.response))
+
+function checkStatus (response) {
+  // console.log(response)
+  if (response.status === 200 || response.status === 304) {
+    return response
+  }
+  return {
+    data: {
+      code: -404,
+      message: response.statusText,
+      data: response.statusText
+    }
+  }
+}
+
+function checkCode (res) {
+  // console.log(res.data.return_code)
+  if (res.data.return_code !== '0') { // 返回码不为0 弹出错误信息
+    alert(res.data.message)
+  }
+  return res
+}
+
+// 封装axios的post请求
+
+export default {
+  post (url, data) {
+    return axios({
+      method: 'post', // 请求协议
+      url: url, // 请求的地址
+      data: qs.stringify(data), // post 请求的数据
+      timeout: 30000, // 超时时间, 单位毫秒
+      headers: {
+        'X-Requested-With': 'XMLHttpRequest',
+        'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
+      }
+    }).then(checkStatus).then(checkCode)
+  },
+  get (url, params) {
+    return axios({
+      method: 'get',
+      url: url,
+      params, // get 请求时带的参数
+      timeout: 30000,
+      headers: {
+        'X-Requested-With': 'XMLHttpRequest'
+      }
+    }).then(checkStatus).then(checkCode)
+  }
+}

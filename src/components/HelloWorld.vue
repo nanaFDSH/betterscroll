@@ -13,8 +13,6 @@
 </template>
 
 <script>
-//  import {MyPost} from '../common/js/ajax_axios'
-
   export default {
     name: 'HelloWorld',
     data () {
