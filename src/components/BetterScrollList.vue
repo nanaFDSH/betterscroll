@@ -29,7 +29,6 @@
     data () {
       return {
         listdata: [],
-        pulldown: true,
         pullDownRefresh: {threshold: 90, stop: 40},
         pullUpLoad: true
       }
@@ -44,7 +43,7 @@
           var data = res.data.result.list
           this.listdata = this.listdata.concat(data)
         }, (res) => {
-
+          console.log(res)
         })
       },
       onPullingDown () {

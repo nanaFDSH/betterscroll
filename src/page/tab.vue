@@ -1,8 +1,8 @@
 <template>
   <div class="tab">
-    <!--<router-link tag="div" class="tab-item" to="/hello">-->
-      <!--<span class="tab-link">hello</span>-->
-    <!--</router-link>-->
+    <router-link tag="div" class="tab-item" to="/hello">
+      <span class="tab-link">hello</span>
+    </router-link>
     <router-link tag="div" class="tab-item" to="/scroll">
       <span class="tab-link">scroll</span>
     </router-link>

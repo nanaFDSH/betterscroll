@@ -46,9 +46,8 @@
 
 <script type="text/ecmascript-6">
   import BScroll from 'better-scroll'
-  import Bubble from '../bubble/bubble.vue'
-  import Loading from '../loading/loading'
-  import { getRect } from '../../common/js/dom'
+  import Bubble from '../bubble/bubble.vue'  // 画布下拉刷新的动画
+  import Loading from '../loading/loading'  // 等待加载动画
 
   export default {
     props: {
@@ -128,12 +127,12 @@
     },
     data () {
       return {
-        beforePullDown: true,
-        isRebounding: false,
-        isPullingDown: false,
-        isPullUpLoad: false,
-        pullUpDirty: true,
-        pullDownStyle: '',
+        beforePullDown: true,  // 判断向下刷下的显示
+        isRebounding: false,   // 动画完成加载数据成功 更新完成
+        isPullingDown: false,  // 判断向下刷新的loading的显示
+        isPullUpLoad: false,   // 上拉加载文字显示
+        pullUpDirty: true,   // 上拉加载 判断是否有更多数据
+        pullDownStyle: '',  // 向下刷新的top值
         bubbleY: 0
       }
     },
@@ -147,7 +146,7 @@
       }
     },
     created () {
-      this.pullDownInitTop = -50
+      this.pullDownInitTop = -50  // 向下刷新，初始位置
     },
     mounted () {
       // 保证在DOM渲染完毕后初始化better-scroll
@@ -159,9 +158,6 @@
       _initScroll () {
         if (!this.$refs.wrapper) {
           return
-        }
-        if (this.$refs.list && (this.pullDownRefresh || this.pullUpLoad)) {
-          this.$refs.list.style.minHeight = `${getRect(this.$refs.wrapper).height + 1}px`
         }
 
         let options = {
@@ -223,10 +219,10 @@
       destroy () {
         this.scroll.destroy()
       },
-      forceUpdate (dirty) {
-        console.log(dirty)
-        console.log(this.pullDownRefresh)
-        console.log(this.isPullingDown)
+      forceUpdate (dirty) { // 是否更数据
+//        console.log(dirty)
+//        console.log(this.pullDownRefresh)
+//        console.log(this.isPullingDown)
         if (this.pullDownRefresh && this.isPullingDown) {
           this.isPullingDown = false
           this._reboundPullDown().then(() => {
@@ -234,15 +230,17 @@
             this._afterPullDown()
           })
         } else if (this.pullUpLoad && this.isPullUpLoad) {
+          console.log('222')
           this.isPullUpLoad = false
           this.scroll.finishPullUp()
           this.pullUpDirty = dirty
           this.refresh()
-        } else {
+        } else { //
+          console.log('333')
           this.refresh()
         }
       },
-      _initPullDownRefresh () {
+      _initPullDownRefresh () { // 下拉刷新
         this.scroll.on('pullingDown', () => {
           this.beforePullDown = false
           this.isPullingDown = true
@@ -262,7 +260,7 @@
           }
         })
       },
-      _initpullUpLoad () {
+      _initpullUpLoad () { // 向上加载
         this.scroll.on('pullingUp', () => {
           this.isPullUpLoad = true
           this.$emit('pullingUp')
@@ -288,8 +286,7 @@
       }
     },
     watch: {
-      // 监听数据的变化，延时refreshDelay时间后调用refresh方法重新计算，保证滚动效果正常
-      data () {
+      data () { // 监听数据的变化，延时refreshDelay时间后调用refresh方法重新计算，保证滚动效果正常
         setTimeout(() => {
           this.forceUpdate(true)
         }, this.refreshDelay)
