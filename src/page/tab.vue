@@ -9,6 +9,9 @@
     <router-link tag="div" class="tab-item" to="/betterscroll">
       <span class="tab-link">betterscroll</span>
     </router-link>
+    <router-link tag="div" class="tab-item" to="/demoBetterScroll">
+      <span class="tab-link">demo</span>
+    </router-link>
   </div>
 </template>
 

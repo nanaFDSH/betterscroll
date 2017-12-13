@@ -1,8 +1,9 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import HelloWorld from '@/components/HelloWorld'
-import ScrollList from '@/components/ScrollList'
-import BetterScrollList from '@/components/BetterScrollList'
+import HelloWorld from '@/page/HelloWorld'
+import ScrollList from '@/page/ScrollList'
+import BetterScrollList from '@/page/BetterScrollList'
+import demoBetterScroll from '@/page/demoBetterScroll'
 
 Vue.use(Router)
 
@@ -10,8 +11,9 @@ export default new Router({
   routes: [
     {
       path: '/',
-      name: 'HelloWorld',
-      component: HelloWorld
+      redirect: {
+        name: 'HelloWorld'
+      }
     },
     {
       path: '/hello',
@@ -27,6 +29,11 @@ export default new Router({
       path: '/betterscroll',
       name: 'BetterScrollList',
       component: BetterScrollList
+    },
+    {
+      path: '/demoBetterScroll',
+      name: 'demoBetterScroll',
+      component: demoBetterScroll
     }
   ]
 })
